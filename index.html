@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Macrovisualització ESS - Valors i política</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/d3.v7.min.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="kicker">Part 2 · Visualització de dades</p>
+      <h1>Valors humans i política a Europa: un atles interactiu amb storytelling</h1>
+      <p class="lead">
+        He portat la idea de la Part 1 fins a una web narrativa ben cuidada.
+        La visualització principal és una única escena animada que canvia segons el relat,
+        i abans tens un explorador general per situar-te amb un mapa i un gràfic de línies.
+      </p>
+      <div class="stat-grid">
+        <div class="stat">
+          <span class="stat-value" id="stat-countries">--</span>
+          <span class="stat-label">països</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-years">--</span>
+          <span class="stat-label">anys ESS</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-rows">--</span>
+          <span class="stat-label">registres agregats</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">Valors + política</span>
+          <span class="stat-label">tema central</span>
+        </div>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Interacció</span>
+        <span class="pill">Animacions</span>
+        <span class="pill">Narrativa</span>
+        <span class="pill">Macro + Micro</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="intro-inner">
+        <h2>Qüestió clau</h2>
+        <p>
+          Sovint associem l'eix esquerra-dreta amb valors personals i confiança en les institucions.
+          Però quines dimensions del diccionari (PVQ, índexs i confiança) són les que realment s'alineen amb l'eix polític?
+          El projecte ho respon amb una criba de correlacions i, després, amb bombolles per entendre casos i excepcions.
+        </p>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Pregunta 1</h3>
+            <p>Quines variables tenen la correlació més forta amb l'eix esquerra-dreta?</p>
+          </div>
+          <div class="card">
+            <h3>Pregunta 2</h3>
+            <p>Quines s'associen amb l'esquerra (r &lt; 0) i quines amb la dreta (r &gt; 0)?</p>
+          </div>
+          <div class="card">
+            <h3>Pregunta 3</h3>
+            <p>El patró es manté entre macroregions i al llarg del temps?</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="charts explorer">
+      <div class="intro-inner">
+        <h2>Explorador general de dades</h2>
+        <p>
+          Abans del relat, una mirada global: mapa per al context geogràfic i un gràfic de línies per veure l'evolució agregada,
+          inclosa la correlació entre valors i eix polític per macroregió.
+        </p>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Mapa europeu</h3>
+              <p>Color per confiança o participació, amb l'any seleccionable.</p>
+            </div>
+            <div class="chart-controls">
+              <label for="map-metric">Mètrica</label>
+              <select id="map-metric">
+                <option value="trust">Confiança</option>
+                <option value="vote_rate">Participació</option>
+                <option value="lr">Eix polític</option>
+              </select>
+              <label for="map-year">Any</label>
+              <select id="map-year"></select>
+            </div>
+          </div>
+          <svg id="map" aria-label="Mapa europeu"></svg>
+          <div id="map-legend" class="legend"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Tendències per macroregió</h3>
+              <p>Gràfic de línies per veure l'evolució agregada.</p>
+            </div>
+            <div class="chart-controls">
+              <button class="chip" data-metric="trust">Confiança</button>
+              <button class="chip" data-metric="openness">Obertura</button>
+              <button class="chip" data-metric="vote_rate">Participació</button>
+              <button class="chip" data-metric="lr">Eix polític</button>
+              <button class="chip active" data-metric="corr_open_lr">Correlació obertura-eix</button>
+            </div>
+          </div>
+          <svg id="line-chart" aria-label="Tendències per macroregió"></svg>
+          <div id="line-legend" class="legend"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-to-read">
+      <div class="intro-inner">
+        <h2>Com interpretar els gràfics del storyboard</h2>
+        <p class="lead">
+          Abans d'entrar al relat, una lectura ràpida i visual per entendre el llenguatge del gràfic principal.
+        </p>
+        <div class="read-grid">
+          <div class="read-card">
+            <div class="read-icon axis"></div>
+            <h3>Eixos</h3>
+            <p><strong>X:</strong> eix polític (esquerra-dreta). <strong>Y:</strong> una variable del diccionari (PVQ, índexs de valors o confiança).</p>
+          </div>
+          <div class="read-card">
+            <div class="read-icon size"></div>
+            <h3>Mida</h3>
+            <p>La mida de la bombolla és la participació electoral. Bombolla gran = més participació.</p>
+          </div>
+          <div class="read-card">
+            <div class="read-icon color"></div>
+            <h3>Color</h3>
+            <p>Indica macroregió: Nordic, Western, Mediterranean, Eastern. Ajuda a detectar patrons estructurals.</p>
+          </div>
+          <div class="read-card">
+            <div class="read-icon time"></div>
+            <h3>Temps</h3>
+            <p>Slider temporal per explorar canvis i oscil·lacions any a any (més útil per explorar que per concloure).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scrolly">
+      <div class="scrolly-text">
+        <div class="step" data-step="scan">
+          <h3>1. Selecció (I): criba de correlacions</h3>
+          <p>
+            Començo amb una criba: calculo la correlació (r de Pearson) entre l'eix esquerra-dreta i cada variable del diccionari
+            (PVQ, índexs de valors i confiança). El rànquing ordena les variables per força d'associació (|r|).
+          </p>
+        </div>
+
+        <div class="step" data-step="scan2">
+          <h3>2. Selecció (II): com llegir el r</h3>
+          <p>
+            <strong>r &lt; 0</strong> indica que, a mesura que ens movem cap a la dreta, el valor tendeix a baixar.
+            <strong>r &gt; 0</strong> indica el contrari. Com més a prop de 1 en valor absolut, més clara és l'associació.
+          </p>
+          <p>
+            Les dues que destaquen són <strong id="focus-neg">—</strong> (negativa) i <strong id="focus-pos">—</strong> (positiva).
+          </p>
+        </div>
+
+        <div class="step" data-step="scan3">
+          <h3>3. Selecció (III): del rànquing a les bombolles</h3>
+          <p>
+            Ara baixem al detall: cada bombolla és un país en un any. Mantinc <strong>X = eix polític</strong> i canvio <strong>Y</strong>
+            per la variable que triïs al rànquing. Això connecta el r (resum) amb patrons i excepcions (lectura visual).
+          </p>
+        </div>
+
+        <div class="step" data-step="neg">
+          <h3>4. Anàlisi (I): la variable més associada a l'esquerra</h3>
+          <p>
+            Fixem la variable amb correlació més negativa: <strong id="focus-neg-name">—</strong>.
+            Si l'eix polític avança cap a la dreta (X creix) i el valor baixa (Y baixa), el patró és clar.
+          </p>
+        </div>
+
+        <div class="step" data-step="neg2">
+          <h3>5. Anàlisi (II): excepcions i contrast</h3>
+          <p>
+            Mira la dispersió al voltant de la línia: països més lluny volen dir comportaments menys “típics” pel seu valor d'eix polític.
+            A la conclusió els ressalto perquè es puguin comentar fàcilment.
+          </p>
+        </div>
+
+        <div class="step" data-step="pos">
+          <h3>6. Anàlisi (I): la variable més associada a la dreta</h3>
+          <p>
+            Ara canviem a la correlació més positiva: <strong id="focus-pos-name">—</strong>.
+            Aquest pas ens serveix per veure l'altre extrem del mapa ideològic.
+          </p>
+        </div>
+
+        <div class="step" data-step="pos2">
+          <h3>7. Anàlisi (II): comparar lectures</h3>
+          <p>
+            Amb una negativa i una positiva, tenim dues cares del mateix eix. El contrast ajuda a detectar si l'associació és general o si depèn
+            de macroregió, participació (mida) o anys concrets.
+          </p>
+        </div>
+
+        <div class="step" data-step="region">
+          <h3>8. Macroregions: el patró canvia per blocs?</h3>
+          <p>
+            Mantinc la variable amb correlació més forta (<strong id="focus-abs-name">—</strong>) i dibuixo una regressió per macroregió.
+            Això separa patrons estructurals entre blocs europeus.
+          </p>
+        </div>
+        <div class="step" data-step="time">
+          <h3>9. Temps: variabilitat i límits</h3>
+          <p>
+            Activem el temps per veure oscil·lacions any a any. És útil per detectar anys atípics, però pot fluctuar prou
+            com per evitar conclusions temporals simples.
+          </p>
+        </div>
+        <div class="step" data-step="conclusion">
+          <h3>10. Conclusions: selecció, lectura i casos extrems</h3>
+          <p>
+            Resum del rànquing: <strong>negatives</strong> → <span id="corr-neg-list">—</span> ·
+            <strong>positives</strong> → <span id="corr-pos-list">—</span>.
+          </p>
+          <p>
+            Al gràfic ressalto països que s'allunyen més de la línia (sobre/sota) per la variable seleccionada, perquè siguin fàcils de comentar.
+            Pots alternar ràpidament entre la variable negativa i la positiva amb els botons del panell.
+          </p>
+        </div>
+      </div>
+
+      <div class="scrolly-viz">
+        <div class="viz-header">
+          <h3 id="viz-title">Bombolles ESS en el temps</h3>
+          <p id="viz-subtitle">Una sola visualització, sis perspectives.</p>
+        </div>
+        <div id="viz-wrap">
+          <svg id="viz" aria-label="Visualització interactiva ESS"></svg>
+          <div id="controls" class="controls hidden">
+            <button id="play" class="btn">Reprodueix</button>
+            <input id="year-slider" type="range" min="0" max="0" step="1" value="0">
+            <span id="year-label"></span>
+          </div>
+        </div>
+        <div id="corr-panel" class="corr-panel hidden" aria-label="Rànquing de correlacions">
+          <div class="corr-head">
+            <span class="corr-title">Correlació (r) amb l'eix polític</span>
+            <span class="corr-hint">Clica una variable per veure les bombolles</span>
+          </div>
+          <div id="corr-list" class="corr-list" role="list"></div>
+        </div>
+        <div id="focus-toggles" class="focus-toggles hidden" aria-label="Canvi ràpid de variable">
+          <button id="btn-focus-neg" class="chip" type="button">Negativa</button>
+          <button id="btn-focus-pos" class="chip" type="button">Positiva</button>
+        </div>
+        <div id="legend" class="legend"></div>
+      </div>
+    </section>
+
+    <section class="insights">
+      <div class="intro-inner">
+        <h2>Idees clau (lectura visual)</h2>
+        <p class="lead">
+          Conclusions extretes directament del gràfic: pendent, r i patrons per macroregió. No hi ha
+          interpretacions amagades: tot es veu al gràfic.
+        </p>
+        <div class="insight-list">
+          <div class="insight-item">
+            <span class="insight-tag">Negativa</span>
+            <p class="insight-text">La correlació més negativa (més associada a l'esquerra) és <strong id="insight-neg">—</strong>.</p>
+          </div>
+          <div class="insight-item">
+            <span class="insight-tag">Positiva</span>
+            <p class="insight-text">La correlació més positiva (més associada a la dreta) és <strong id="insight-pos">—</strong>.</p>
+          </div>
+          <div class="insight-item">
+            <span class="insight-tag">Rànquing</span>
+            <p class="insight-text">La criba fa visible quines dimensions separen més l'eix: PVQ, índexs i confiança queden en una mateixa escala (r).</p>
+          </div>
+          <div class="insight-item">
+            <span class="insight-tag">Macroregions</span>
+            <p class="insight-text">Comparant per macroregió apareixen pendents diferents i blocs que es desplacen de manera sistemàtica.</p>
+          </div>
+          <div class="insight-item">
+            <span class="insight-tag">Temps</span>
+            <p class="insight-text">Hi ha oscil·lacions any a any: el patró general es veu, però el detall temporal és més sorollós.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="method">
+      <div class="intro-inner">
+        <h2>Metodologia i dades (resum del procés)</h2>
+        <p class="lead">
+          El flux combina neteja de l'ESS, càlcul d'índexs de valors (PVQ) i agregació país-any per obtenir una lectura comparativa estable.
+          La visualització calcula correlacions i regressions a partir del CSV local (i també hi ha un bundle JS per obrir-ho sense servidor).
+        </p>
+        <div class="method-list">
+          <div class="method-item">
+            <span class="method-step">01</span>
+            <p><strong>Font i variables:</strong> ESS + PVQ, índexs de valors, eix polític, confiança, satisfacció i vot.</p>
+          </div>
+          <div class="method-item">
+            <span class="method-step">02</span>
+            <p><strong>Preparació:</strong> R (dplyr) per a neteja, recodificació i agregació país-any.</p>
+          </div>
+          <div class="method-item">
+            <span class="method-step">03</span>
+            <p><strong>Agregació:</strong> país-any amb mitjanes (i participació com a percentatge), amb <em>n</em> per contextualitzar la mida de mostra.</p>
+          </div>
+          <div class="method-item">
+            <span class="method-step">04</span>
+            <p><strong>Estadística visual:</strong> correlació de Pearson (r) i regressió lineal (pendent), calculades amb D3.</p>
+          </div>
+          <div class="method-item">
+            <span class="method-step">05</span>
+            <p><strong>Codificació:</strong> D3.js (bombolles + force layout), rànquing de correlacions, mapa GeoJSON i gràfic de línies.</p>
+          </div>
+          <div class="method-item">
+            <span class="method-step">06</span>
+            <p><strong>Eines:</strong> HTML/CSS/JS, D3 v7 local, dades en CSV + bundle JS, servidor local opcional.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Projecte Part 2 – Visualització de dades (ESS).</p>
+  </footer>
+
+  <div id="tooltip" class="tooltip" role="tooltip"></div>
+  <script src="data/ess_country_year.js"></script>
+  <script src="data/europe.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
